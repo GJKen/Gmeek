@@ -190,11 +190,11 @@ class GMEEK():
         if '<code class="notranslate">Gmeek-html' in post_body:
             post_body = re.sub(r'<code class="notranslate">Gmeek-html(&lt;.*?&gt;)</code>', lambda match: html.unescape(match.group(1)), post_body, flags=re.DOTALL)
 
-        # 手动插入外链图片
+        # 手动插入外链图片<p><code><img>
         if '<code class="notranslate">Gmeek-imgbox' in post_body:
             post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
-        # 处理 GitHub Camo 代理的图片链接，提取原始 URL
+        # 处理默认情况下的图片匹配规则<p><a><img>
         if 'data-canonical-src' in post_body:
             post_body = re.sub(
                 r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?data-canonical-src="([^"]*?)"[^>]*?></a>',
@@ -202,10 +202,6 @@ class GMEEK():
                 post_body,
                 flags=re.DOTALL
             )
-
-        # 通用插入图片情况下的匹配规则<a> -><img>
-        if '<a target="_blank" rel=' in post_body:
-            post_body = re.sub(r'<a[^>]*?href="([^"]+)"[^>]*?><img[^>]*?src="\1"[^>]*?></a>',lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
         # 剧透
         if '<code class="notranslate">Gmeek-spoilertxt' in post_body: 
