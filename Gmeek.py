@@ -193,6 +193,7 @@ class GMEEK():
         # 手动插入外链图片<p><code><img>
         if '<code class="notranslate">Gmeek-imgbox' in post_body:
             post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
+            post_body = re.sub(r'<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>', lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
         # 处理默认情况下的图片匹配规则<p><a><img>
         if 'data-canonical-src' in post_body:
