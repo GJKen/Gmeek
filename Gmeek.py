@@ -195,13 +195,20 @@ class GMEEK():
             post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
         # 处理默认情况下的图片匹配规则<p><a><img>
-        if 'data-canonical-src' in post_body:
-            post_body = re.sub(
-                r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?data-canonical-src="([^"]*?)"[^>]*?></a>',
-                lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">',
-                post_body,
-                flags=re.DOTALL
-            )
+        # if 'data-canonical-src' in post_body:
+        #     post_body = re.sub(
+        #         r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?data-canonical-src="([^"]*?)"[^>]*?></a>',
+        #         lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">',
+        #         post_body,
+        #         flags=re.DOTALL
+        #     )
+        # 优先取 data-canonical-src，没有则取 src
+        post_body = re.sub(
+            r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
+            lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1) or match.group(2)}">',
+            post_body,
+            flags=re.DOTALL
+        )
 
         # 剧透
         if '<code class="notranslate">Gmeek-spoilertxt' in post_body: 
