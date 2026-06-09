@@ -149,6 +149,33 @@ class GMEEK():
         f.write(output)
         f.close()
 
+    def createDescription(self, issue_body):
+        if issue_body==None:
+            return ''
+
+        desc = re.sub(r'\r\n|\r|\n', ' ', issue_body)
+        desc = re.sub(r'##\s*\{.*?\}\s*$', '', desc)
+        desc = re.sub(r'!\[[^\]]*\]\([^)]+\)', '', desc)
+        desc = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', desc)
+        desc = re.sub(r'[`*_>#~-]+', ' ', desc)
+        desc = re.sub(r'<[^>]+>', ' ', desc)
+        desc = re.sub(r'\s+', ' ', desc).strip()
+
+        if desc == '':
+            return ''
+
+        if self.blogBase["rssSplit"]=="sentence":
+            period = "。" if self.blogBase["i18n"]=="CN" else "."
+        else:
+            period = self.blogBase["rssSplit"]
+
+        if period in desc:
+            desc = desc.split(period)[0].strip() + period
+        elif len(desc) > 160:
+            desc = desc[:160].rstrip() + "..."
+
+        return desc
+
     def createPostHtml(self,issue):
         mdFileName=re.sub(r'[<>:/\\|?*\"]|[\0-\31]', '-', issue["postTitle"])
         f = open(self.backup_dir+mdFileName+".md", 'r', encoding='UTF-8')
@@ -365,14 +392,7 @@ class GMEEK():
                 self.blogBase[listJsonName][postNum]["wordCount"]=0
             else:
                 self.blogBase[listJsonName][postNum]["wordCount"]=len(issue.body)
-                if self.blogBase["rssSplit"]=="sentence":
-                    if self.blogBase["i18n"]=="CN":
-                        period="。"
-                    else:
-                        period="."
-                else:
-                    period=self.blogBase["rssSplit"]
-                self.blogBase[listJsonName][postNum]["description"]=issue.body.split(period)[0].replace("\"", "\'")+period
+                self.blogBase[listJsonName][postNum]["description"]=self.createDescription(issue.body)
                 
             self.blogBase[listJsonName][postNum]["top"]=0
             for event in issue.get_events():
