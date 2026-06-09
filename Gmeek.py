@@ -194,15 +194,9 @@ class GMEEK():
         if '<code class="notranslate">Gmeek-imgbox' in post_body:
             post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
-        # 处理默认情况下的图片匹配规则<p><a><img>
-        # if 'data-canonical-src' in post_body:
-        #     post_body = re.sub(
-        #         r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?data-canonical-src="([^"]*?)"[^>]*?></a>',
-        #         lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">',
-        #         post_body,
-        #         flags=re.DOTALL
-        #     )
-        # 优先取 data-canonical-src，没有则取 src
+        # 处理默认情况下的图片匹配规则
+        # 匹配结构: <a href="..."><img data-canonical-src="..."></a>
+        # 将匹配到的图片标签转换为懒加载图片组件
         post_body = re.sub(
             r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
             lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1) or match.group(2)}">',
