@@ -214,7 +214,7 @@ class GMEEK():
         if '<ul class="contains-task-list">' in post_body:
             issue["style"]=issue["style"]+'<style>.contains-task-list{padding-left:0.9em !important;list-style:none}</style>'
 
-        # Gmeek-html 内联 HTML 注入
+        # 给原本的Gmeek-html增加小括号判断:<>, 缩小匹配范围
         # 匹配结构:<code class="notranslate">Gmeek-html&lt;div&gt;...&lt;/div&gt;</code>
         if '<code class="notranslate">Gmeek-html' in post_body:
             post_body = re.sub(r'<code class="notranslate">Gmeek-html(&lt;.*?&gt;)</code>', lambda match:html.unescape(match.group(1)), post_body, flags=re.DOTALL)
@@ -225,19 +225,27 @@ class GMEEK():
         if '<code class="notranslate">Gmeek-imgbox' in post_body:
             post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match:f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
-
+        # 处理 spoilerimg 标记的图片
+        if 'data-canonical-src' in post_body or 'src=' in post_body:
+            post_body = re.sub(
+                r'<a[^>]*?href="[^"]*?"[^>]*?><img(?=[^>]*?alt="\{spoilerimg\}")[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
+                lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img class="spoilerimg" data-fancybox="gallery" img-src="{match.group(1) or match.group(2)}">',
+                post_body,
+                flags=re.DOTALL
+            )
 
         # 处理默认情况下的图片匹配规则
         # 匹配结构:<a href="..."><img data-canonical-src="..."></a>
         # 将匹配到的图片标签转换为懒加载图片组件
-        post_body = re.sub(
-            r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
-            lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1) or match.group(2)}">',
-            post_body,
-            flags=re.DOTALL
-        )
+        if 'data-canonical-src' in post_body:
+            post_body = re.sub(
+                r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?data-canonical-src="([^"]*?)"[^>]*?></a>',
+                lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">',
+                post_body,
+                flags=re.DOTALL
+            )
 
-        # 文本防剧透
+        # 剧透
         if '<code class="notranslate">Gmeek-spoilertxt' in post_body:
             post_body = re.sub(r'<code class="notranslate">Gmeek-spoilertxt="([^"]+)"</code>', lambda match:f'<span class="spoilerText">{match.group(1)}</span>', post_body, flags=re.DOTALL)
 
