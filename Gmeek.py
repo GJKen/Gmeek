@@ -226,10 +226,11 @@ class GMEEK():
             post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match:f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
         # 图片防剧透
-        # 匹配结构: <img ... alt="Gmeek-spoilerimg" ...>
+        # 匹配结构: <img ... alt="{spoilerimg}" ...>
+        # 来源: Issue 中写 ![{spoilerimg}](图片URL)，alt 文本作为标记，页面上不显示
         # 作用: 移除 alt 标记，给 <img> 加上 spolierimg 类，点击后移除模糊效果
-        if 'Gmeek-spoilerimg' in post_body:
-            post_body = re.sub(r'<img\s+(.*?)alt="Gmeek-spoilerimg"\s*/?>', lambda match: f'<img {match.group(1)}class="spolierimg" />', post_body)
+        if '{spoilerimg}' in post_body:
+            post_body = re.sub(r'<img\s+(.*?)alt="\{spoilerimg\}"\s*/?>', lambda match: f'<img {match.group(1)}class="spolierimg" />', post_body)
 
         # 处理默认情况下的图片匹配规则
         # 匹配结构:<a href="..."><img data-canonical-src="..."></a>
