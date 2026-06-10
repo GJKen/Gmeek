@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding:utf-8 -*-
 import os
 import re
 import json
@@ -18,7 +18,7 @@ from collections import OrderedDict
 ######################################################################################
 i18n={"Search":"Search","switchTheme":"switch theme","home":"home","comments":"comments","run":"run ","days":" days","Previous":"Previous","Next":"Next"}
 i18nCN={"Search":"搜索","switchTheme":"切换主题","home":"首页","comments":"评论","run":"网站已运行","days":"天","Previous":"上一页","Next":"下一页"}
-i18nRU={"Search":"Поиск","switchTheme": "Сменить тему","home":"Главная","comments":"Комментарии","run":"работает ","days":" дней","Previous":"Предыдущая","Next":"Следующая"}
+i18nRU={"Search":"Поиск","switchTheme":"Сменить тему","home":"Главная","comments":"Комментарии","run":"работает ","days":" дней","Previous":"Предыдущая","Next":"Следующая"}
 IconBase={
     "post":"M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25Zm1.75-.25a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25ZM3.5 6.25a.75.75 0 0 1 .75-.75h7a.75.75 0 0 1 0 1.5h-7a.75.75 0 0 1-.75-.75Zm.75 2.25h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1 0-1.5Z",
     "link":"m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z",
@@ -116,7 +116,7 @@ class GMEEK():
                 self.blogBase["homeUrl"] = f"https://{self.repo.name}"
             else:
                 self.blogBase["homeUrl"] = f"https://{self.repo.owner.login}.github.io/{self.repo.name}"
-        print("GitHub Pages URL: ", self.blogBase["homeUrl"])
+        print("GitHub Pages URL:", self.blogBase["homeUrl"])
 
         if self.blogBase["i18n"]=="CN":
             self.i18n=i18nCN
@@ -131,14 +131,14 @@ class GMEEK():
         return user.get_repo(repo)
 
     def markdown2html(self, mdstr):
-        payload = {"text": mdstr, "mode": "gfm"}
-        headers = {"Authorization": "token {}".format(self.options.github_token)}
+        payload = {"text":mdstr, "mode":"gfm"}
+        headers = {"Authorization":"token {}".format(self.options.github_token)}
         try:
             response = requests.post("https://api.github.com/markdown", json=payload, headers=headers)
             response.raise_for_status()  # Raises an exception if status code is not 200
             return response.text
         except requests.RequestException as e:
-            raise Exception("markdown2html error: {}".format(e))
+            raise Exception("markdown2html error:{}".format(e))
 
     def renderHtml(self,template,blogBase,postListJson,htmlDir,icon):
         file_loader = FileSystemLoader('templates')
@@ -187,16 +187,16 @@ class GMEEK():
         if '<math-renderer' in post_body:
             post_body=re.sub(r'<math-renderer.*?>','',post_body)
             post_body=re.sub(r'</math-renderer>','',post_body)
-            issue["script"]=issue["script"]+'<script>MathJax = {tex: {inlineMath: [["$", "$"]]}};</script><script async src="https://testingcf.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>'
+            issue["script"]=issue["script"]+'<script>MathJax = {tex:{inlineMath:[["$", "$"]]}};</script><script async src="https://testingcf.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>'
         
         if '<p class="markdown-alert-title">' in post_body:
             issue["style"]=issue["style"]+'<style>.markdown-alert{border-radius:6px;padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style>'
             alerts = {
-                'note': 'accent',
-                'tip': 'success',
-                'important': 'done',
-                'warning': 'attention',
-                'caution': 'danger'
+                'note':'accent',
+                'tip':'success',
+                'important':'done',
+                'warning':'attention',
+                'caution':'danger'
             }
 
             for alert, style in alerts.items():
@@ -206,34 +206,45 @@ class GMEEK():
                         f'border-left-color:var(--borderColor-{style}-emphasis, var(--color-{style}-emphasis));'
                         f'background-color:var(--color-{style}-subtle);}}'
                         f'.markdown-alert.markdown-alert-{alert} .markdown-alert-title {{'
-                        f'color: var(--fgColor-{style},var(--color-{style}-fg));}}</style>'
+                        f'color:var(--fgColor-{style},var(--color-{style}-fg));}}</style>'
                     )
 
-        # 优化任务列表样式
+        # 任务列表样式修复
+        # 匹配结构:<ul class="contains-task-list">...</ul>
         if '<ul class="contains-task-list">' in post_body:
             issue["style"]=issue["style"]+'<style>.contains-task-list{padding-left:0.9em !important;list-style:none}</style>'
 
-        # 给原本的Gmeek-html增加小括号判断:<>, 缩小匹配范围
+        # Gmeek-html 内联 HTML 注入
+        # 匹配结构:<code class="notranslate">Gmeek-html&lt;div&gt;...&lt;/div&gt;</code>
         if '<code class="notranslate">Gmeek-html' in post_body:
-            post_body = re.sub(r'<code class="notranslate">Gmeek-html(&lt;.*?&gt;)</code>', lambda match: html.unescape(match.group(1)), post_body, flags=re.DOTALL)
+            post_body = re.sub(r'<code class="notranslate">Gmeek-html(&lt;.*?&gt;)</code>', lambda match:html.unescape(match.group(1)), post_body, flags=re.DOTALL)
 
-        # 手动插入外链图片<p><code><img>
+        # Gmeek-imgbox 外链图片
+        # 匹配结构:<p><code class="notranslate">Gmeek-imgbox="https://..."</code></p>
+        # 将匹配到的图片标签转换为懒加载图片组件
         if '<code class="notranslate">Gmeek-imgbox' in post_body:
-            post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
+            post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match:f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
+
+        # 图片防剧透
+        # 匹配结构: <img ... alt="Gmeek-spoilerimg" ...>
+        # 作用: 移除 alt 标记，给 <img> 加上 spolierimg 类，点击后移除模糊效果
+        if 'Gmeek-spoilerimg' in post_body:
+            post_body = re.sub(r'<img\s+(.*?)alt="Gmeek-spoilerimg"\s*/?>', lambda match: f'<img {match.group(1)}class="spolierimg" />', post_body)
 
         # 处理默认情况下的图片匹配规则
-        # 匹配结构: <a href="..."><img data-canonical-src="..."></a>
+        # 匹配结构:<a href="..."><img data-canonical-src="..."></a>
         # 将匹配到的图片标签转换为懒加载图片组件
+        # 保留已有的 class 属性（如 spolierimg 防剧透类）
         post_body = re.sub(
-            r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
-            lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1) or match.group(2)}">',
+            r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?(class="[^"]*?")?[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
+            lambda match:f'<div class="ImgLazyLoad-circle"></div>\n<img {match.group(1) or ""}data-fancybox="gallery" img-src="{match.group(2) or match.group(3)}">',
             post_body,
             flags=re.DOTALL
         )
 
-        # 剧透
-        if '<code class="notranslate">Gmeek-spoilertxt' in post_body: 
-            post_body = re.sub(r'<code class="notranslate">Gmeek-spoilertxt="([^"]+)"</code>', lambda match: f'<span class="spoilerText">{match.group(1)}</span>', post_body, flags=re.DOTALL)
+        # 文本防剧透
+        if '<code class="notranslate">Gmeek-spoilertxt' in post_body:
+            post_body = re.sub(r'<code class="notranslate">Gmeek-spoilertxt="([^"]+)"</code>', lambda match:f'<span class="spoilerText">{match.group(1)}</span>', post_body, flags=re.DOTALL)
 
         postBase["postTitle"]=issue["postTitle"]
         postBase["postUrl"]=self.blogBase["homeUrl"]+"/"+issue["postUrl"]
@@ -485,7 +496,7 @@ class GMEEK():
         else:
             if self.blogBase["urlMode"]=="issue":
                 fileName=str(issue.number)
-            elif self.blogBase["urlMode"]=="ru_translit": 
+            elif self.blogBase["urlMode"]=="ru_translit":
                 fileName=str(translit(issue.title, language_code='ru', reversed=True)).replace(' ', '-')
             else:
                 fileName=Pinyin().get_pinyin(issue.title)
@@ -561,12 +572,12 @@ docListFile.close()
 if os.environ.get('GITHUB_EVENT_NAME')!='schedule':
     print("====== update readme file ======")
     workspace_path = os.environ.get('GITHUB_WORKSPACE')
-    readme="# %s :link: %s \r\n" % (blog.blogBase["title"],blog.blogBase["homeUrl"])
-    readme=readme+"### :page_facing_up: [%d](%s/tag.html) \r\n" % (len(blog.blogBase["postListJson"])-1,blog.blogBase["homeUrl"])
-    readme=readme+"### :speech_balloon: %d \r\n" % commentNumSum
-    readme=readme+"### :hibiscus: %d \r\n" % wordCount
-    readme=readme+"### :alarm_clock: %s \r\n" % datetime.datetime.now(blog.TZ).strftime('%Y-%m-%d %H:%M:%S')
-    readme=readme+"### Powered by :heart: [Gmeek](https://github.com/Meekdai/Gmeek)\r\n"
+    readme="# %s :link:%s \r\n" % (blog.blogBase["title"],blog.blogBase["homeUrl"])
+    readme=readme+"### :page_facing_up:[%d](%s/tag.html) \r\n" % (len(blog.blogBase["postListJson"])-1,blog.blogBase["homeUrl"])
+    readme=readme+"### :speech_balloon:%d \r\n" % commentNumSum
+    readme=readme+"### :hibiscus:%d \r\n" % wordCount
+    readme=readme+"### :alarm_clock:%s \r\n" % datetime.datetime.now(blog.TZ).strftime('%Y-%m-%d %H:%M:%S')
+    readme=readme+"### Powered by :heart:[Gmeek](https://github.com/Meekdai/Gmeek)\r\n"
     readmeFile=open(workspace_path+"/README.md","w")
     readmeFile.write(readme)
     readmeFile.close()
