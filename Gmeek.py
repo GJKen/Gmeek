@@ -230,8 +230,13 @@ class GMEEK():
         # 来源: Issue 中写 ![{spoilerimg}](图片URL)，GitHub 把 alt 渲染在 <a> 标签上
         # 作用: 替换为懒加载图片组件 + spoilerimg 类，点击后移除模糊效果
         if '{spoilerimg}' in post_body:
-            post_body = re.sub(r'<a[^>]*?href="([^"]+)"[^>]*?alt="\{spoilerimg\}"[^>]*?></a>', lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img class="spoilerimg" data-fancybox="gallery" img-src="{match.group(1)}">', post_body)
-
+            post_body = re.sub(
+                r'<a[^>]*?href="([^"]+)"[^>]*?alt="\{spoilerimg\}"[^>]*?>\s*</a>',
+                lambda match: (
+                    f'<div class="ImgLazyLoad-circle" style="display: none;"></div>\n'
+                    f'<img data-fancybox="gallery" img-src="{match.group(1)}" src="{match.group(1)}" class="ImgLoaded spoilerimg">'),
+                post_body,
+                flags=re.DOTALL)
         # 处理默认情况下的图片匹配规则
         # 匹配结构:<a href="..."><img data-canonical-src="..."></a>
         # 将匹配到的图片标签转换为懒加载图片组件
