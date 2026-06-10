@@ -225,28 +225,26 @@ class GMEEK():
         if '<code class="notranslate">Gmeek-imgbox' in post_body:
             post_body = re.sub(r'<p>\s*<code class="notranslate">Gmeek-imgbox="([^"]+)"</code>\s*</p>', lambda match:f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">', post_body, flags=re.DOTALL)
 
-        # 图片防剧透
-        # 匹配结构: <a ... href="URL" alt="{spoilerimg}" ...></a>
-        # 来源: Issue 中写 ![{spoilerimg}](图片URL)，GitHub 把 alt 渲染在 <a> 标签上
-        # 作用: 替换为懒加载图片组件 + spoilerimg 类，点击后移除模糊效果
-        if '{spoilerimg}' in post_body:
+        # 处理 spoilerimg 标记的图片
+        # 匹配结构：<a href="..."><img alt="{spoilerimg}" data-canonical-src="..."></a>
+        if 'data-canonical-src' in post_body:
             post_body = re.sub(
-                r'<a[^>]*?href="([^"]+)"[^>]*?alt="\{spoilerimg\}"[^>]*?>\s*</a>',
-                lambda match: (
-                    f'<div class="ImgLazyLoad-circle" style="display: none;"></div>\n'
-                    f'<img data-fancybox="gallery" img-src="{match.group(1)}" src="{match.group(1)}" class="ImgLoaded spoilerimg">'),
+                r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?alt="\{spoilerimg\}"[^>]*?data-canonical-src="([^"]*?)"[^>]*?></a>',
+                lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img class="spoilerimg" data-fancybox="gallery" img-src="{match.group(1)}">',
                 post_body,
-                flags=re.DOTALL)
+                flags=re.DOTALL
+            )
+
         # 处理默认情况下的图片匹配规则
         # 匹配结构:<a href="..."><img data-canonical-src="..."></a>
         # 将匹配到的图片标签转换为懒加载图片组件
-        # 保留已有的 class 属性（如 spoilerimg 防剧透类）
-        post_body = re.sub(
-            r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?(class="[^"]*?")?[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
-            lambda match:f'<div class="ImgLazyLoad-circle"></div>\n<img {match.group(1) or ""}data-fancybox="gallery" img-src="{match.group(2) or match.group(3)}">',
-            post_body,
-            flags=re.DOTALL
-        )
+        if 'data-canonical-src' in post_body:
+            post_body = re.sub(
+                r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?data-canonical-src="([^"]*?)"[^>]*?></a>',
+                lambda match: f'<div class="ImgLazyLoad-circle"></div>\n<img data-fancybox="gallery" img-src="{match.group(1)}">',
+                post_body,
+                flags=re.DOTALL
+            )
 
         # 文本防剧透
         if '<code class="notranslate">Gmeek-spoilertxt' in post_body:
