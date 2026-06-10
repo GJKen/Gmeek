@@ -228,14 +228,14 @@ class GMEEK():
         # 图片防剧透
         # 匹配结构: <img ... alt="{spoilerimg}" ...>
         # 来源: Issue 中写 ![{spoilerimg}](图片URL)，alt 文本作为标记，页面上不显示
-        # 作用: 移除 alt 标记，给 <img> 加上 spolierimg 类，点击后移除模糊效果
+        # 作用: 移除 alt 标记，给 <img> 加上 spoilerimg 类，点击后移除模糊效果
         if '{spoilerimg}' in post_body:
-            post_body = re.sub(r'<img\s+(.*?)alt="\{spoilerimg\}"\s*/?>', lambda match: f'<img {match.group(1)}class="spolierimg" />', post_body)
+            post_body = re.sub(r'<img\s+(.*?)alt="\{spoilerimg\}"\s*/?>', lambda match: f'<img {match.group(1)}class="spoilerimg" />', post_body)
 
         # 处理默认情况下的图片匹配规则
         # 匹配结构:<a href="..."><img data-canonical-src="..."></a>
         # 将匹配到的图片标签转换为懒加载图片组件
-        # 保留已有的 class 属性（如 spolierimg 防剧透类）
+        # 保留已有的 class 属性（如 spoilerimg 防剧透类）
         post_body = re.sub(
             r'<a[^>]*?href="[^"]*?"[^>]*?><img[^>]*?(class="[^"]*?")?[^>]*?(?:data-canonical-src="([^"]*?)"|src="([^"]*?)")[^>]*?></a>',
             lambda match:f'<div class="ImgLazyLoad-circle"></div>\n<img {match.group(1) or ""}data-fancybox="gallery" img-src="{match.group(2) or match.group(3)}">',
