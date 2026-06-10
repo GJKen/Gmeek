@@ -118,8 +118,7 @@ function openComments(){
     script.setAttribute("issue-term","title");
     {% if blogBase['themeMode']=='manual' %}
     if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
-    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
-    else{script.setAttribute("theme","preferred-color-scheme");}
+    else{script.setAttribute("theme","github-light");}
     {% else %}
     script.setAttribute("theme","{{ blogBase['nightTheme'] }}");
     {% endif %}
