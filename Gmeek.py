@@ -176,6 +176,36 @@ class GMEEK():
 
         return desc
 
+    def add_blank_target_to_links(self, post_body):
+        def patch_link(match):
+            tag = match.group(0)
+            href_match = re.search(r'href="([^"]*)"', tag, flags=re.I)
+            if not href_match:
+                return tag
+
+            href = href_match.group(1).strip()
+            if href.startswith('#'):
+                return tag
+
+            if not re.search(r'\s+target\s*=', tag, flags=re.I):
+                tag = tag.replace('<a ', '<a target="_blank" ', 1)
+
+            if re.search(r'\s+rel\s*=', tag, flags=re.I):
+                def patch_rel(rel_match):
+                    values = rel_match.group(1).split()
+                    for value in ['noopener', 'noreferrer']:
+                        if value not in values:
+                            values.append(value)
+                    return f'rel="{" ".join(values)}"'
+
+                tag = re.sub(r'rel="([^"]*)"', patch_rel, tag, flags=re.I)
+            else:
+                tag = tag.replace('<a ', '<a rel="noopener noreferrer" ', 1)
+
+            return tag
+
+        return re.sub(r'<a\s+[^>]*href="[^"]*"[^>]*>', patch_link, post_body, flags=re.I)
+
     def createPostHtml(self,issue):
         mdFileName=re.sub(r'[<>:/\\|?*\"]|[\0-\31]', '-', issue["postTitle"])
         f = open(self.backup_dir+mdFileName+".md", 'r', encoding='UTF-8')
@@ -243,6 +273,8 @@ class GMEEK():
         # 剧透
         if '<code class="notranslate">Gmeek-spoilertxt' in post_body:
             post_body = re.sub(r'<code class="notranslate">Gmeek-spoilertxt="([^"]+)"</code>', lambda match:f'<span class="spoilertxt">{match.group(1)}</span>', post_body, flags=re.DOTALL)
+
+        post_body = self.add_blank_target_to_links(post_body)
 
         postBase["postTitle"]=issue["postTitle"]
         postBase["postUrl"]=self.blogBase["homeUrl"]+"/"+issue["postUrl"]
